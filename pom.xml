@@ -26,6 +26,11 @@
         <module>grok-core/grok-session</module>
         <module>grok-core/grok-permission</module>
         <module>grok-core/grok-workflow</module>
+        <module>grok-core/grok-git</module>
+        <module>grok-core/grok-fs-watch</module>
+        <module>grok-core/grok-telemetry</module>
+        <module>grok-core/grok-auth</module>
+        <module>grok-core/grok-skills</module>
         <module>grok-tools/grok-tool-bash</module>
         <module>grok-tools/grok-tool-file</module>
         <module>grok-tools/grok-tool-search</module>
@@ -117,6 +122,31 @@
             <dependency>
                 <groupId>ai.grok</groupId>
                 <artifactId>grok-tool-scheduler</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.grok</groupId>
+                <artifactId>grok-git</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.grok</groupId>
+                <artifactId>grok-fs-watch</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.grok</groupId>
+                <artifactId>grok-telemetry</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.grok</groupId>
+                <artifactId>grok-auth</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.grok</groupId>
+                <artifactId>grok-skills</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <!-- LangChain4j -->
