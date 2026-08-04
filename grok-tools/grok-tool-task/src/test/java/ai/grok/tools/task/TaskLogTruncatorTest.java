@@ -167,4 +167,94 @@ class TaskLogTruncatorTest {
             assertTrue(result.contains("characters truncated"));
         }
     }
+
+    @Nested
+    @DisplayName("Partial Output Support (2026-08-03 sync)")
+    class PartialOutputSupport {
+
+        @Test
+        @DisplayName("PartialOutput.partOf creates partial output")
+        void partOfCreatesPartialOutput() {
+            var partial = TaskLogTruncator.PartialOutput.partOf("held", 5_000_000);
+            assertEquals("held", partial.text());
+            assertEquals(5_000_000, partial.totalBytes());
+            assertFalse(partial.isComplete());
+        }
+
+        @Test
+        @DisplayName("PartialOutput.complete creates complete output")
+        void completeCreatesCompleteOutput() {
+            var complete = TaskLogTruncator.PartialOutput.complete("full text");
+            assertEquals("full text", complete.text());
+            assertEquals(9, complete.totalBytes());
+            assertTrue(complete.isComplete());
+        }
+
+        @Test
+        @DisplayName("Complete output within limit returns unchanged")
+        void completeOutputWithinLimitReturnsUnchanged() {
+            var truncator = new TaskLogTruncator(100, 50, 40);
+            var complete = TaskLogTruncator.PartialOutput.complete("short");
+            var result = truncator.truncateWithPreview(complete);
+
+            assertFalse(result.wasTruncated());
+            assertEquals("short", result.text());
+        }
+
+        @Test
+        @DisplayName("Partial output within limit still states real size")
+        void partialOutputWithinLimitStillStatesRealSize() {
+            var truncator = new TaskLogTruncator(4_000, 2_000, 1_000);
+            var partial = TaskLogTruncator.PartialOutput.partOf("held", 5_000_000);
+            var result = truncator.truncateWithPreview(partial, 2_000, "Use read_file for full content");
+
+            assertTrue(result.wasTruncated());
+            assertTrue(result.text().startsWith("held"), result.text());
+            assertTrue(result.text().contains("5000000 bytes total"), result.text());
+            assertTrue(result.text().contains("Use read_file for full content"), result.text());
+        }
+
+        @Test
+        @DisplayName("Partial output exceeding limit is truncated with total size")
+        void partialOutputExceedingLimitIsTruncatedWithTotalSize() {
+            var truncator = new TaskLogTruncator(4_000, 2_000, 1_000);
+            String held = "x".repeat(10_000);
+            var partial = TaskLogTruncator.PartialOutput.partOf(held, 5_000_000);
+            var result = truncator.truncateWithPreview(partial, 2_000, null);
+
+            assertTrue(result.wasTruncated());
+            assertTrue(result.text().contains("5000000 bytes total"), result.text());
+        }
+
+        @Test
+        @DisplayName("Null output returns empty result")
+        void nullOutputReturnsEmptyResult() {
+            var truncator = new TaskLogTruncator();
+            var result = truncator.truncateWithPreview(null);
+
+            assertFalse(result.wasTruncated());
+            assertEquals("", result.text());
+        }
+
+        @Test
+        @DisplayName("Footer hint is included when provided")
+        void footerHintIsIncludedWhenProvided() {
+            var truncator = new TaskLogTruncator(100, 50, 40);
+            var partial = TaskLogTruncator.PartialOutput.partOf("text", 1000);
+            var result = truncator.truncateWithPreview(partial, 50, "Custom hint");
+
+            assertTrue(result.text().contains("Custom hint"), result.text());
+        }
+
+        @Test
+        @DisplayName("Convenience method uses default preview size")
+        void convenienceMethodUsesDefaultPreviewSize() {
+            var truncator = new TaskLogTruncator(100, 50, 40);
+            var partial = TaskLogTruncator.PartialOutput.partOf("text", 1000);
+            var result = truncator.truncateWithPreview(partial);
+
+            assertTrue(result.wasTruncated());
+            assertTrue(result.text().contains("1000 bytes total"), result.text());
+        }
+    }
 }
