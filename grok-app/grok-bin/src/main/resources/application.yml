@@ -1,0 +1,13 @@
+spring:
+  main:
+    banner-mode: off
+    web-application-type: none
+  threads:
+    virtual:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    ai.grok: DEBUG
+    dev.langchain4j: INFO
