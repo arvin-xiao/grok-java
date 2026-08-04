@@ -1,5 +1,7 @@
 package ai.grok.tools.task;
 
+import java.util.Locale;
+
 /**
  * Utility for truncating task log output.
  * Mirrors the Rust `util/truncate.rs` from xai-grok-tools (2026-08-03 sync).
@@ -148,9 +150,9 @@ public final class TaskLogTruncator {
         // Build footer with total size
         String footer;
         if (footerHint != null && !footerHint.isEmpty()) {
-            footer = String.format("[Output truncated - %d bytes total. %s]", totalBytes, footerHint);
+            footer = String.format(Locale.ROOT, "[Output truncated - %d bytes total. %s]", totalBytes, footerHint);
         } else {
-            footer = String.format("[Output truncated - %d bytes total]", totalBytes);
+            footer = String.format(Locale.ROOT, "[Output truncated - %d bytes total]", totalBytes);
         }
 
         // Text that fits the limit can still be part of a larger output;
